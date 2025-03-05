@@ -1883,6 +1883,10 @@ class SWF(VerboseOutput, TrackedCoverage):
                 rotation_origin.z = 0.0
                 transform = transform.to_affine()
 
+            if flags & 0x200000:
+                self.vprint(f"{prefix}    <!> im going to kill myself (unknown flags; 0x200000) <!>")
+                unhandled_flags &= ~0x200000
+
             self.vprint(f"{prefix}    Final transform: {transform}", component="tags")
 
             if unhandled_flags != 0:
@@ -2736,7 +2740,7 @@ class SWF(VerboseOutput, TrackedCoverage):
             raise Exception(f"Unrecognzied magic {magic}!")
         if length != len(data):
             raise Exception(f"Unexpected length in AFP header, {length} != {len(data)}!")
-        if ap2_data_version not in [7, 8, 9, 10]:
+        if ap2_data_version not in [7, 8, 9, 10, 11]: #fuck
             raise Exception(f"Unsupported AP2 container version {ap2_data_version}!")
         if version != 0x200:
             raise Exception(f"Unsupported AP2 version {version}!")
