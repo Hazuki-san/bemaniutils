@@ -392,7 +392,7 @@ class TXP2File(TrackedCoverage, VerboseOutput):
         length = struct.unpack(f"{self.endian}I", self.data[12:16])[0]
         self.add_coverage(12, 4)
         if length != len(self.data):
-            raise Exception(f"Invalid graphic file length, expecting {length} bytes!")
+            raise Exception(f"Invalid graphic file length, expecting {length} bytes! (has {len(self.data)} bytes)")
 
         # This is always the header length, or the offset of the data payload.
         header_length = struct.unpack(f"{self.endian}I", self.data[16:20])[0]
@@ -437,7 +437,10 @@ class TXP2File(TrackedCoverage, VerboseOutput):
                     if name_offset != 0 and texture_offset != 0:
                         lz_data: Optional[bytes] = None
                         if self.legacy_lz:
-                            raise Exception("We don't support legacy lz mode!")
+                            self.vprint(
+                                f"    WARNING: LEGACY LZ IS NOT SUPPORTED YET, SKIPPING THIS FOR PES SAKE!"
+                            )
+                        #     raise Exception("We don't support legacy lz mode!")
                         elif self.modern_lz:
                             # Get size, round up to nearest power of 4
                             inflated_size, deflated_size = struct.unpack(
@@ -478,20 +481,21 @@ class TXP2File(TrackedCoverage, VerboseOutput):
                             raw_data = self.data[(texture_offset + 8) : (texture_offset + 8 + deflated_size)]
                             self.add_coverage(texture_offset, deflated_size + 8)
 
-                        tdxt = TDXT.fromBytes(raw_data)
-                        if tdxt.endian != self.endian:
-                            raise Exception("Unexpected texture format!")
+                        if not self.legacy_lz:
+                            tdxt = TDXT.fromBytes(raw_data)
+                            if tdxt.endian != self.endian:
+                                raise Exception("Unexpected texture format!")
 
-                        if tdxt.img is None:
-                            self.vprint(f"Unsupported format {hex(tdxt.fmt)} for texture {name}")
+                            if tdxt.img is None:
+                                self.vprint(f"Unsupported format {hex(tdxt.fmt)} for texture {name}")
 
-                        self.textures.append(
-                            Texture(
-                                name,
-                                tdxt,
-                                lz_data,
+                            self.textures.append(
+                                Texture(
+                                    name,
+                                    tdxt,
+                                    lz_data,
+                                )
                             )
-                        )
         else:
             self.vprint("Bit 0x000001 - textures; NOT PRESENT")
 
