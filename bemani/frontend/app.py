@@ -38,8 +38,6 @@ FRONTEND_CACHE_BUST: str = "site.1.3.react.16.14"
 
 @app.before_request
 def before_request() -> None:
-    global config
-
     g.cache = cache
     g.config = config
 
@@ -70,6 +68,7 @@ def after_request(response: Response) -> Response:
         response.cache_control.no_cache = True
         response.cache_control.must_revalidate = True
         response.cache_control.private = True
+    response.headers["X-Robots-Tag"] = "noindex"
     return response
 
 
@@ -410,6 +409,51 @@ def navigation() -> Dict[str, Any]:
                 "entries": bishi_entries,
                 "base_uri": app.blueprints["bishi_pages"].url_prefix,
                 "gamecode": GameConstants.BISHI_BASHI.value,
+            },
+        )
+
+    if GameConstants.DANCE_EVOLUTION in g.config.support:
+        # Dance Evolution pages
+        danevo_entries = []
+        if len([p for p in profiles if p[0] == GameConstants.DANCE_EVOLUTION]) > 0:
+            danevo_entries.extend(
+                [
+                    {
+                        "label": "Game Options",
+                        "uri": url_for("danevo_pages.viewsettings"),
+                    },
+                    {
+                        "label": "Personal Profile",
+                        "uri": url_for("danevo_pages.viewplayer", userid=g.userID),
+                    },
+                    {
+                        "label": "Dance Mates",
+                        "uri": url_for("danevo_pages.viewdancemates", userid=g.userID),
+                    },
+                    {
+                        "label": "Personal Records",
+                        "uri": url_for("danevo_pages.viewrecords", userid=g.userID),
+                    },
+                ]
+            )
+        danevo_entries.extend(
+            [
+                {
+                    "label": "Global Records",
+                    "uri": url_for("danevo_pages.viewnetworkrecords"),
+                },
+                {
+                    "label": "All Players",
+                    "uri": url_for("danevo_pages.viewplayers"),
+                },
+            ]
+        )
+        pages.append(
+            {
+                "label": "Dance Evolution",
+                "entries": danevo_entries,
+                "base_uri": app.blueprints["danevo_pages"].url_prefix,
+                "gamecode": GameConstants.DANCE_EVOLUTION.value,
             },
         )
 

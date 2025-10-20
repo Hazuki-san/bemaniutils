@@ -16,6 +16,7 @@ from bemani.frontend.ddr import ddr_pages
 from bemani.frontend.sdvx import sdvx_pages
 from bemani.frontend.reflec import reflec_pages
 from bemani.frontend.museca import museca_pages
+from bemani.frontend.danevo import danevo_pages
 from bemani.utils.config import (
     load_config as base_load_config,
     instantiate_cache as base_instantiate_cache,
@@ -24,8 +25,6 @@ from bemani.utils.config import (
 
 
 def register_blueprints() -> None:
-    global config
-
     app.register_blueprint(account_pages)
     app.register_blueprint(admin_pages)
     app.register_blueprint(arcade_pages)
@@ -49,21 +48,20 @@ def register_blueprints() -> None:
         app.register_blueprint(reflec_pages)
     if GameConstants.MUSECA in config.support:
         app.register_blueprint(museca_pages)
+    if GameConstants.DANCE_EVOLUTION in config.support:
+        app.register_blueprint(danevo_pages)
 
 
 def register_games() -> None:
-    global config
     base_register_games(config)
 
 
 def load_config(filename: str) -> None:
-    global config
     base_load_config(filename, config)
     app.secret_key = config.secret_key
 
 
 def instantiate_cache(app: Any) -> None:
-    global config
     base_instantiate_cache(config, app)
 
 

@@ -1,15 +1,16 @@
 # Introduction
 
-A collection of programs for working with various games in the BEMANI series. This
-could be untangled quite a bit into various modules that provide simpler pieces.
-However, this is how it ended up evolving over time. This repository includes
-utilities for unpacking (and sometimes repacking) various file formats, emulating
-network services for various games, utilities for sniffing, redirecting and
-reconstructing network packets, utilities for gathering information about various
-game music databases and associated tooling that makes developing the previous
-utilities easier. It is meant to be a complete ecosystem for somebody looking to
-provide hobby network services to themselves in order to preserve a particular era
-of gaming that is no longer officially supported.
+A collection of programs for working with various games in and out of the BEMANI
+series. This could be untangled quite a bit into various modules that provide
+simpler pieces. However, this is how it ended up evolving over time. This
+repository includes utilities for unpacking (and sometimes repacking) various
+file formats, emulating network services for various games, utilities for
+sniffing, redirecting and reconstructing network packets, utilities for
+gathering information about various game music databases and associated tooling
+that makes developing the previous utilities easier. It is meant to be a
+complete ecosystem for somebody looking to provide hobby network services to
+themselves in order to preserve a particular era of gaming that is no longer
+officially supported.
 
 Thanks to Tau for the great writeup on the binary network format. Thanks to some
 rando on stack overflow for RC4 code for Python. Thanks to some other rando on
@@ -46,12 +47,12 @@ how to use it.
 ## api
 
 Development version of this repository's BEMAPI implementation. This serves as the
-REST-like API layer for inter-network federation of scores, profiles and rivals.
-Run it like `./api --help` to see help output and determine how to use this. Much
-like "services" and "frontend", this should be pointed at the development version
-of your services config file which holds information about the MySQL database that
-this should connect to as well as what game series are supported. See
-`config/server.yaml` for an example file that you can modify.
+REST-like API layer for inter-network federation of game song catalogs, scores,
+profiles and rivals. Run it like `./api --help` to see help output and determine
+how to use this. Much like "services" and "frontend", this should be pointed at
+the development version of your services config file which holds information about
+the MySQL database that this should connect to as well as what game series are
+supported. See `config/server.yaml` for an example file that you can modify.
 
 Do not use this utility to serve production traffic. Instead, see
 `bemani/wsgi/api.wsgi` for a ready-to-go WSGI file that can be used with a Python
@@ -187,6 +188,16 @@ behavior makes fast iteration possible by treating JSX files the same way that t
 production webserver such as nginx to serve static files. Run it like `./jsx --help`
 to see help output and learn how to use it.
 
+## nvram
+
+A utility that can decrypt and re-encrypt files inside the nvram folder, including the
+`info.bin` file. This allows you to get part way to replacing files in the nvram of a
+cabinet that is running stock data. For XML files, to decrypt you will want to use
+the `--strip-padding` option. To re-encrypt, you will want to use the `--add-padding`
+option. For the `info.bin` file you will instead want to use `--no-reset` for both
+encryption and decryption. Note that the encryption is symmetrical, so the same
+utility can be called for both unwrapping and re-wrapping data.
+
 ## proxy
 
 A utility to MITM a network session. Point a game at the port this listens on, and
@@ -283,12 +294,13 @@ BEMANI games boot and supports full scores, profile and events for Beatmania IID
 Pop'n Music 19-27, Jubeat Saucer, Saucer Fulfill, Prop, Qubell, Clan and Festo, Sound
 Voltex 1, 2, 3 Season 1/2 and 4, Dance Dance Revolution X2, X3, 2013, 2014 and Ace,
 MÚSECA 1, MÚSECA 1+1/2, MÚSECA Plus, Reflec Beat, Limelight, Colette, groovin'!! Upper,
-Volzza 1 and Volzza 2, Metal Gear Arcade, and finally The\*BishiBashi. Note that it also
-has matching support for all Reflec Beat versions as well as MGA. By default, this serves
-traffic based solely on the database it is configured against. If you federate with
-other networks using the "Data API" admin page, it will upgrade to serving traffic
-based on the profiles, scores and statistics of all connected networks as well as the
-local database. Run like `./services --help` to see how to use this.
+Volzza 1 and Volzza 2, Metal Gear Arcade, The\*BishiBashi, and finally, Dance Evolution
+Arcade. Note that it also has matching support for all Reflec Beat versions as well
+as MGA. By default, this serves traffic based solely on the database it is configured
+against. If you federate with other networks using the "Data API" admin page, it will
+upgrade to serving traffic based on the profiles, scores and statistics of all
+connected networks as well as the local database. Run like `./services --help` to
+see how to use this.
 
 Do not use this utility to serve production traffic. Instead, see
 `bemani/wsgi/api.wsgi` for a ready-to-go WSGI file that can be used with a Python
@@ -306,7 +318,7 @@ which has the paths set up for correct imports.
 A convenience utility for helping reverse-engineer structures out of game DLLs/EXEs.
 You can give this a physical DLL offset or a virtual memory address for the start and
 end of the data as well as a python struct format (documentation at
-https://docs.python.org/3.6/library/struct.html) and this will print the decoded
+https://docs.python.org/3.8/library/struct.html) and this will print the decoded
 data to the screen one entry per line. It includes several enhancements for decoding
 pointers to sub-structures and pointers to C strings. Note that much like "psmap", this
 has the ability to print out structures that are dynamically constructed at runtime by
@@ -331,9 +343,11 @@ simply verify that certain things exist so as not to crash a real client. This
 currently generates traffic emulating Beatmania IIDX 20-26, Pop'n Music 19-27, Jubeat
 Saucer, Fulfill, Prop, Qubell, Clan and Festo, Sound Voltex 1, 2, 3 Season 1/2 and 4,
 Dance Dance Revolution X2, X3, 2013, 2014 and Ace, The\*BishiBashi, MÚSECA 1 and MÚSECA
-1+1/2, Reflec Beat, Reflec Beat Limelight, Reflec Beat Colette, groovin'!! Upper,
-Volzza 1 and Volzza 2 ad Metal Gear Arcade and can verify card events and score events
-as well as PASELI transactions. Run it like `./trafficgen --help` to see how to use this.
+1+1/2, Reflec Beat, Limelight, Colette, groovin'!! Upper, Volzza 1 and Volzza 2,
+Dance Evolution Arcade and Metal Gear Arcade and can verify card events and score
+events as well as PASELI transactions. Run it like `./trafficgen --help` to see how
+to use this.
+
 Note tha this takes a config file which sets up how the clients behave. See
 `config/trafficgen.yaml` for a sample file that can be used.
 
@@ -379,10 +393,10 @@ you aren't introducing any type errors into the codebase.
 
 ## Dependency Setup
 
-The code contained here assumes Python 3.6 as the base although it should work with
+The code contained here assumes Python 3.8 as the base although it should work with
 any newer version of python as well. If you don't have or don't want to install Python
-3.6 as your system python, it is recommended to use virtualenv to create a virtual
-environment. The rest of the installation will assume you have Python 3.6 working
+3.8 as your system python, it is recommended to use virtualenv to create a virtual
+environment. The rest of the installation will assume you have Python 3.8 working
 properly (and are in an activated virtual environment if this is the route you've
 chosen to go). If you have a newer version of python available this code should be
 compatible with that as well. This code is designed to run on Linux. However, it has
@@ -680,6 +694,17 @@ corresponding to version in the following table:
 ./read --config config/server.yaml --series reflec --version 1 --bin reflecbeat.dll
 ```
 
+### Dance Evolution
+
+For Dance Evolution, you will need the `resource_lists.arc` file out of `data/arc/`
+for the game that you wish to import. Then, run the following command. Note that
+Dance Evolution only ever had one release so you only need to do this to the newest
+copy of the data you wish to run.
+
+```
+./read --config config/server.yaml --series danevo --version 1 --bin resource_lists.arc
+```
+
 ## Running Locally
 
 Once you've set all of this up, you can start the network in debug mode using a command
@@ -845,7 +870,7 @@ free certificate that you can manage easily. There are other ways to run this so
 and provide SSL credentials but I have no experience with or advice on them.
 
 The easiest way to get up and running is to install MySQL 5.7, nginx and uWSGI along
-with Python 3.6 or higher. Create a directory where the services will live and place
+with Python 3.8 or higher. Create a directory where the services will live and place
 a virtualenv inside it (outside the scope of this document). Then, the wsgi files found
 in `bemani/wsgi/` can be placed in the directory, uWSGI pointed at them and nginx set up.
 The setup for the top-level package will include all of the frontend templates, so you

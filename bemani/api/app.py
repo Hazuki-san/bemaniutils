@@ -32,8 +32,6 @@ def jsonify_response(data: Dict[str, Any], code: int = 200) -> Response:
 
 @app.before_request
 def before_request() -> None:
-    global config
-
     g.config = config
     g.data = Data(config)
     g.authorized = False
@@ -213,6 +211,7 @@ def lookup(protoversion: str, requestgame: str, requestversion: str) -> Dict[str
         ("popnmusic", GameConstants.POPN_MUSIC),
         ("reflecbeat", GameConstants.REFLEC_BEAT),
         ("soundvoltex", GameConstants.SDVX),
+        ("danceevolution", GameConstants.DANCE_EVOLUTION),
     ]:
         if constant in g.config.support:
             gamemapping[gameid] = constant
@@ -294,6 +293,9 @@ def lookup(protoversion: str, requestgame: str, requestversion: str) -> Dict[str
                 "2": VersionConstants.SDVX_INFINITE_INFECTION,
                 "3": VersionConstants.SDVX_GRAVITY_WARS,
                 "4": VersionConstants.SDVX_HEAVENLY_HAVEN,
+            },
+            GameConstants.DANCE_EVOLUTION: {
+                "1": VersionConstants.DANCE_EVOLUTION,
             },
         }
         .get(game, {})
